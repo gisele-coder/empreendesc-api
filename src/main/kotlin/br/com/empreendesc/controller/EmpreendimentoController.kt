@@ -1,9 +1,13 @@
 package br.com.empreendesc.controller
 
+import br.com.empreendesc.domain.Segmento
 import br.com.empreendesc.dto.EmpreendimentoRequest
 import br.com.empreendesc.dto.EmpreendimentoResponse
 import br.com.empreendesc.mapper.EmpreendimentoMapper
 import br.com.empreendesc.service.EmpreendimentoService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
@@ -37,10 +42,32 @@ class EmpreendimentoController(
     }
 
     @GetMapping
-    fun findAll(): ResponseEntity<List<EmpreendimentoResponse>> {
-        val empreendimentos = empreendimentoService.findAll()
-        val responses = empreendimentos.map(EmpreendimentoMapper::toResponse)
-        return ResponseEntity.ok(responses)
+    fun findAll(
+        @RequestParam(required = false) municipio: String?,
+        @RequestParam(required = false) segmento: String?,
+        @RequestParam(defaultValue = "0") page: Int,
+        @RequestParam(defaultValue = "10") size: Int
+    ): ResponseEntity<Page<EmpreendimentoResponse>> {
+        val pageable = PageRequest.of(page, size)
+
+        val pageResult = when {
+            !municipio.isNullOrBlank() ->
+                empreendimentoService.buscarPorMunicipio(municipio, pageable)
+
+            !segmento.isNullOrBlank() -> {
+                val segmentoEnum = runCatching { Segmento.valueOf(segmento.uppercase()) }.getOrNull()
+                    ?: return ResponseEntity.ok(PageImpl(emptyList(), pageable, 0))
+                empreendimentoService.buscarPorSegmento(segmentoEnum, pageable)
+            }
+
+            else -> empreendimentoService.findAll(pageable)
+        }
+
+        val responses = pageResult.content.map(EmpreendimentoMapper::toResponse)
+        val responsePage: Page<EmpreendimentoResponse> =
+            PageImpl(responses, pageable, pageResult.totalElements)
+
+        return ResponseEntity.ok(responsePage)
     }
 
     @GetMapping("/{id}")
