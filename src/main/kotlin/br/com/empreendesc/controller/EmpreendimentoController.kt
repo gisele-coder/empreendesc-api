@@ -59,5 +59,10 @@ class EmpreendimentoController(
         empreendimentoService.delete(existing.id!!)
         return ResponseEntity.noContent().build()
     }
+
+    @GetMapping("/teste")
+    fun teste(): String {
+        return "API funcionando"
+    }
 }
 
