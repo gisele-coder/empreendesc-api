@@ -1,0 +1,20 @@
+/.idea/
+.idea/
+*.iml
+/build/
+/local.properties
+/.gradle/
+/.DS_Store
+# Android Studio Navigation Editor
+.navigation/
+# Android Studio captures folder
+captures/
+# IntelliJ
+out/
+# Keystore files
+*.jks
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+# Android NDK
+/obj/
+
