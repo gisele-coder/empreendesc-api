@@ -5,6 +5,7 @@ import br.com.empreendesc.dto.EmpreendimentoRequest
 import br.com.empreendesc.dto.EmpreendimentoResponse
 import br.com.empreendesc.mapper.EmpreendimentoMapper
 import br.com.empreendesc.service.EmpreendimentoService
+import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.ResponseEntity
@@ -18,7 +19,7 @@ class EmpreendimentoController(
 ) {
 
     @PostMapping
-    fun create(@RequestBody request: EmpreendimentoRequest): ResponseEntity<EmpreendimentoResponse> {
+    fun create(@Valid @RequestBody request: EmpreendimentoRequest): ResponseEntity<EmpreendimentoResponse> {
 
         val entity = EmpreendimentoMapper.toEntity(request)
         val saved = empreendimentoService.create(entity)
@@ -74,7 +75,7 @@ class EmpreendimentoController(
     @PutMapping("/{id}")
     fun update(
         @PathVariable id: Long,
-        @RequestBody request: EmpreendimentoRequest
+        @Valid @RequestBody request: EmpreendimentoRequest
     ): ResponseEntity<EmpreendimentoResponse> {
 
         val existing = empreendimentoService.findById(id)

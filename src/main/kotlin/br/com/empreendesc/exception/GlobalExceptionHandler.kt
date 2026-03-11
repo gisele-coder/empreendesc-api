@@ -3,12 +3,34 @@ package br.com.empreendesc.exception
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 @RestControllerAdvice
 class GlobalExceptionHandler {
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleValidation(
+        ex: MethodArgumentNotValidException,
+        request: HttpServletRequest
+    ): ResponseEntity<ApiError> {
+
+        val message = ex.bindingResult
+            .fieldErrors
+            .joinToString(", ") { "${it.field}: ${it.defaultMessage}" }
+
+        val error = ApiError(
+            timestamp = LocalDateTime.now(),
+            status = HttpStatus.BAD_REQUEST.value(),
+            error = "Validation Error",
+            message = message,
+            path = request.requestURI
+        )
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error)
+    }
 
     @ExceptionHandler(NoSuchElementException::class)
     fun handleNoSuchElement(
@@ -36,14 +58,15 @@ class GlobalExceptionHandler {
         ex: Exception,
         request: HttpServletRequest
     ): ResponseEntity<ApiError> {
+
         val body = ApiError(
-            timestamp = OffsetDateTime.now(),
+            timestamp = LocalDateTime.now(),
             status = status.value(),
             error = status.reasonPhrase,
             message = ex.message,
             path = request.requestURI
         )
+
         return ResponseEntity.status(status).body(body)
     }
 }
-

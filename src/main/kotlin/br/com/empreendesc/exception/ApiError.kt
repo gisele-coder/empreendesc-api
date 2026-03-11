@@ -1,9 +1,9 @@
 package br.com.empreendesc.exception
 
-import java.time.OffsetDateTime
+import java.time.LocalDateTime
 
 data class ApiError(
-    val timestamp: OffsetDateTime,
+    val timestamp: LocalDateTime?,
     val status: Int,
     val error: String,
     val message: String?,
