@@ -5,6 +5,8 @@ import br.com.empreendesc.dto.EmpreendimentoRequest
 import br.com.empreendesc.dto.EmpreendimentoResponse
 import br.com.empreendesc.mapper.EmpreendimentoMapper
 import br.com.empreendesc.service.EmpreendimentoService
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -14,11 +16,13 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 
 @RestController
 @RequestMapping("/empreendimentos")
+@Tag(name = "Empreendimentos", description = "Operations related to business entities")
 class EmpreendimentoController(
     private val empreendimentoService: EmpreendimentoService
 ) {
 
     @PostMapping
+    @Operation(summary = "Create a new empreendimento")
     fun create(@Valid @RequestBody request: EmpreendimentoRequest): ResponseEntity<EmpreendimentoResponse> {
 
         val entity = EmpreendimentoMapper.toEntity(request)
@@ -36,6 +40,7 @@ class EmpreendimentoController(
     }
 
     @GetMapping
+    @Operation(summary = "List empreendimentos with pagination")
     fun findAll(
         @RequestParam(required = false) municipio: String?,
         @RequestParam(required = false) segmento: Segmento?,
@@ -62,10 +67,11 @@ class EmpreendimentoController(
     }
 
     @GetMapping("/{id}")
+    @Operation(summary = "Get empreendimento by id")
     fun findById(@PathVariable id: Long): ResponseEntity<EmpreendimentoResponse> {
 
         val empreendimento = empreendimentoService.findById(id)
-            ?: throw NoSuchElementException("Empreendimento não encontrado")
+            ?: throw NoSuchElementException("Empreendimento nï¿½o encontrado")
 
         val response = EmpreendimentoMapper.toResponse(empreendimento)
 
@@ -73,13 +79,14 @@ class EmpreendimentoController(
     }
 
     @PutMapping("/{id}")
+    @Operation(summary = "Update empreendimento")
     fun update(
         @PathVariable id: Long,
         @Valid @RequestBody request: EmpreendimentoRequest
     ): ResponseEntity<EmpreendimentoResponse> {
 
         val existing = empreendimentoService.findById(id)
-            ?: throw NoSuchElementException("Empreendimento não encontrado")
+            ?: throw NoSuchElementException("Empreendimento nï¿½o encontrado")
 
         val updated = existing.apply {
             nome = request.nome
@@ -98,10 +105,11 @@ class EmpreendimentoController(
     }
 
     @DeleteMapping("/{id}")
+    @Operation(summary = "Delete empreendimento")
     fun delete(@PathVariable id: Long): ResponseEntity<Void> {
 
         val existing = empreendimentoService.findById(id)
-            ?: throw NoSuchElementException("Empreendimento não encontrado")
+            ?: throw NoSuchElementException("Empreendimento nï¿½o encontrado")
 
         empreendimentoService.delete(existing.id!!)
 
