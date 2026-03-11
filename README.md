@@ -1,7 +1,34 @@
 # Empreendimentos SC API
 
+![Kotlin](https://img.shields.io/badge/Kotlin-1.9-purple)
+![Spring Boot](https://img.shields.io/badge/SpringBoot-3.x-brightgreen)
+![Gradle](https://img.shields.io/badge/Build-Gradle-blue)
+![API](https://img.shields.io/badge/API-REST-orange)
+![Swagger](https://img.shields.io/badge/Docs-Swagger-green)
+
 API REST desenvolvida em **Kotlin + Spring Boot** para gerenciamento de empreendimentos.
-O projeto demonstra boas práticas de desenvolvimento backend, incluindo arquitetura em camadas, validação de dados, paginação, tratamento global de erros e organização de código.
+
+O projeto demonstra boas práticas de desenvolvimento backend, incluindo **arquitetura em camadas**, **validação de dados**, **paginação**, **tratamento global de erros**, **testes automatizados** e **documentação OpenAPI/Swagger**.
+
+---
+
+# ? Quick Start
+
+Para rodar a API rapidamente:
+
+```bash
+git clone https://github.com/SEU-USUARIO/empreendesc-api.git
+cd empreendesc-api
+./gradlew bootRun
+```
+
+Abra no navegador:
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+A partir do Swagger você já pode **testar todos os endpoints da API**.
 
 ---
 
@@ -13,25 +40,26 @@ O projeto demonstra boas práticas de desenvolvimento backend, incluindo arquitet
 * H2 Database
 * Jakarta Validation
 * Gradle
+* OpenAPI / Swagger
 * REST API
 
 ---
 
 # Arquitetura do Projeto
 
-O projeto segue uma arquitetura em camadas para separar responsabilidades e facilitar manutenção.
+A aplicação segue uma arquitetura em camadas para separar responsabilidades e facilitar manutenção.
 
-```
-controller
-   ?
-service
-   ?
-repository
-   ?
-database
+```mermaid
+flowchart TD
+    Client[Client / Swagger / Insomnia] --> Controller[Controller Layer]
+    Controller --> Service[Service Layer]
+    Service --> Repository[Repository Layer]
+    Repository --> Database[(H2 Database)]
 ```
 
-Estrutura de pacotes:
+---
+
+# Estrutura de Pacotes
 
 ```
 br.com.empreendesc
@@ -45,40 +73,64 @@ br.com.empreendesc
  ??? config
 ```
 
+### Responsabilidades
+
+**Controller**
+
+* Exposição dos endpoints REST
+* Recebimento das requisições HTTP
+
+**Service**
+
+* Contém a lógica de negócio da aplicação
+
+**Repository**
+
+* Acesso aos dados usando Spring Data JPA
+
+**Domain**
+
+* Entidades e enums do domínio
+
 ---
 
 # Funcionalidades
 
 * CRUD completo de empreendimentos
 * Paginação de resultados
-* Filtros por município e segmento
+* Filtros por município
+* Filtros por segmento
 * Validação automática de dados
 * Tratamento global de exceções
 * Logs de operações
+* Documentação automática com Swagger
+* Testes automatizados de Controller e Service
 * Dados de exemplo carregados automaticamente
 
 ---
 
 # Executando o Projeto
 
-### Pré-requisitos
+## Pré-requisitos
 
 * Java 17+
 * Gradle
 
-### Rodar a aplicação
+---
 
-```
+## Rodar a aplicação
+
+```bash
 ./gradlew bootRun
 ```
 
-ou pelo IntelliJ executando a classe:
+ou execute a classe:
 
 ```
 EmpreendescApiApplication
 ```
 
-A API será iniciada em:
+A aplicação será iniciada em:
 
 ```
 http://localhost:8080
@@ -86,9 +138,26 @@ http://localhost:8080
 
 ---
 
+# ? Documentação da API (Swagger)
+
+Após iniciar a aplicação, acesse a documentação interativa da API:
+
+```
+http://localhost:8080/swagger-ui/index.html
+```
+
+No Swagger é possível:
+
+* visualizar todos os endpoints
+* testar requisições diretamente no navegador
+* visualizar exemplos de request e response
+* consultar schemas da API
+
+---
+
 # Endpoints da API
 
-### Criar empreendimento
+## Criar empreendimento
 
 POST `/empreendimentos`
 
@@ -107,7 +176,7 @@ Exemplo de request:
 
 ---
 
-### Listar empreendimentos
+## Listar empreendimentos
 
 GET `/empreendimentos`
 
@@ -119,7 +188,7 @@ GET /empreendimentos?page=0&size=10
 
 ---
 
-### Filtrar por município
+## Filtrar por município
 
 ```
 GET /empreendimentos?municipio=Florianopolis
@@ -127,7 +196,7 @@ GET /empreendimentos?municipio=Florianopolis
 
 ---
 
-### Filtrar por segmento
+## Filtrar por segmento
 
 ```
 GET /empreendimentos?segmento=TECNOLOGIA
@@ -135,7 +204,7 @@ GET /empreendimentos?segmento=TECNOLOGIA
 
 ---
 
-### Buscar por ID
+## Buscar por ID
 
 ```
 GET /empreendimentos/{id}
@@ -143,7 +212,7 @@ GET /empreendimentos/{id}
 
 ---
 
-### Atualizar empreendimento
+## Atualizar empreendimento
 
 ```
 PUT /empreendimentos/{id}
@@ -151,7 +220,7 @@ PUT /empreendimentos/{id}
 
 ---
 
-### Remover empreendimento
+## Remover empreendimento
 
 ```
 DELETE /empreendimentos/{id}
@@ -161,7 +230,9 @@ DELETE /empreendimentos/{id}
 
 # Tratamento de Erros
 
-A API possui tratamento global de exceções retornando respostas padronizadas:
+A API possui tratamento global de exceções retornando respostas padronizadas.
+
+Exemplo:
 
 ```json
 {
@@ -179,7 +250,7 @@ A API possui tratamento global de exceções retornando respostas padronizadas:
 
 Campos obrigatórios são validados automaticamente usando **Jakarta Validation**.
 
-Exemplo de erro:
+Exemplo de erro de validação:
 
 ```json
 {
@@ -193,9 +264,38 @@ Exemplo de erro:
 
 # Banco de Dados
 
-O projeto utiliza **H2 Database em memória** para facilitar execução e testes.
+O projeto utiliza **H2 Database em memória**, facilitando execução e testes.
 
 Dados de exemplo são carregados automaticamente na inicialização da aplicação.
+
+---
+
+# Testes Automatizados
+
+O projeto inclui testes automatizados para:
+
+* Controller (MockMvc)
+* Service (Mockito)
+
+Execute os testes com:
+
+```bash
+./gradlew test
+```
+
+---
+
+# Future Improvements
+
+Algumas melhorias que poderiam ser implementadas em uma evolução futura do projeto:
+
+* Implementação de autenticação e autorização (Spring Security / JWT)
+* Integração com banco de dados persistente (PostgreSQL ou MySQL)
+* Versionamento de API
+* Containerização com Docker
+* Integração contínua (CI/CD)
+* Monitoramento com Actuator e Prometheus
+* Testes de integração com Testcontainers
 
 ---
 
@@ -205,7 +305,9 @@ Este projeto foi desenvolvido como **desafio técnico para avaliação de habilidad
 
 * organização de código
 * boas práticas de API REST
+* arquitetura em camadas
 * uso de Spring Boot com Kotlin
-* arquitetura limpa e extensível
+* testes automatizados
+* documentação OpenAPI
 
 ---
